@@ -14,8 +14,8 @@ type ToDo struct {
 	Deadline *time.Time `json:"deadline"`
 	isNew    bool
 
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func NewToDo() *ToDo {
