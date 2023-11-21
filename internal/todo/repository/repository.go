@@ -21,8 +21,8 @@ func (r *Repository) FindByID(ctx context.Context, id uuid.UUID) (*domain.ToDo, 
 	var todo domain.ToDo
 	err := r.connection.QueryRow(
 		ctx,
-		"select id, name, body, deadline, createdAt, updatedAt from todo.todo where id=$1",
-		id).Scan(&todo.ID, &todo.Name, &todo.Body, &todo.Deadline, &todo.CreatedAt, &todo.UpdatedAt)
+		"select id, name, priority, body, deadline, createdAt, updatedAt from todo.todo where id=$1",
+		id).Scan(&todo.ID, &todo.Name, &todo.Priority, &todo.Body, &todo.Deadline, &todo.CreatedAt, &todo.UpdatedAt)
 	return &todo, err
 }
 
@@ -30,8 +30,8 @@ func (r *Repository) FindByIDForUpdate(ctx context.Context, id uuid.UUID) (*doma
 	var todo domain.ToDo
 	err := r.connection.QueryRow(
 		ctx,
-		"select id, name, body, deadline, createdAt, updatedAt from todo.todo where id=$1 for update",
-		id).Scan(&todo.ID, &todo.Name, &todo.Body, &todo.Deadline, &todo.CreatedAt, &todo.UpdatedAt)
+		"select id, name, priority, body, deadline, createdAt, updatedAt from todo.todo where id=$1 for update",
+		id).Scan(&todo.ID, &todo.Name, &todo.Priority, &todo.Body, &todo.Deadline, &todo.CreatedAt, &todo.UpdatedAt)
 	return &todo, err
 }
 
@@ -40,7 +40,7 @@ func (r *Repository) Save(ctx context.Context, todo *domain.ToDo) error {
 		_, err := r.connection.Exec(
 			ctx,
 			"update todo.todo SET name=$1, priority=$2, body=$3, deadline=$4, updatedAt=$5 where id=$6",
-			todo.Name, todo.Priority, todo.Body, todo.Deadline, time.Now(), todo.ID,
+			todo.Name, todo.Priority, todo.Body, todo.Deadline, todo.UpdatedAt, todo.ID,
 		)
 
 		return err

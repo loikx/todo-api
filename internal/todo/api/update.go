@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"todo-api/internal/todo/usecases"
+	"todo-api/pkg/errors"
 )
 
 type UpdateToDoHandler struct {
@@ -19,20 +20,23 @@ func NewUpdateToDoHandler(useCase *usecases.UpdateUseCase) *UpdateToDoHandler {
 func (handler *UpdateToDoHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	body, err := io.ReadAll(request.Body)
 	if err != nil {
-		http.Error(writer, err.Error(), http.StatusBadRequest)
+		bytes, _ := json.Marshal(errors.Error{Message: err.Error()})
+		http.Error(writer, string(bytes), http.StatusBadRequest)
 		return
 	}
 
 	command := usecases.UpdateCommand{}
 	err = json.Unmarshal(body, &command)
 	if err != nil {
-		http.Error(writer, err.Error(), http.StatusBadRequest)
+		bytes, _ := json.Marshal(errors.Error{Message: err.Error()})
+		http.Error(writer, string(bytes), http.StatusBadRequest)
 		return
 	}
 
 	err = handler.useCase.Handle(request.Context(), &command)
 	if err != nil {
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		bytes, _ := json.Marshal(errors.Error{Message: err.Error()})
+		http.Error(writer, string(bytes), http.StatusInternalServerError)
 		return
 	}
 
